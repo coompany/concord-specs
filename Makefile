@@ -1,15 +1,25 @@
 pandoc=pandoc -s
-markdown=-t markdown_github
 citations=--filter pandoc-citeproc
 plantuml=--filter ./plantuml.py
+dist_folder=dist
+output=-o ${dist_folder}/
 
-all: clean readme specs
+all: clean specs
 
-readme:
-	${pandoc} README.pdoc ${markdown} -o README.md
+specs: checkdir specs.md specs.txt specs.html
+	mv plantuml-images ${dist_folder}/
 
-specs:
-	${pandoc} specs.pdoc ${citations} ${markdown} ${plantuml} -o specs.md
+%.md: %.pdoc
+	${pandoc} $< ${citations} -t markdown_github ${plantuml} ${output}$@
+
+%.txt: %.pdoc
+	${pandoc} $< ${citations} -t plain ${output}$@
+
+%.html: %.pdoc
+	${pandoc} $< ${citations} -t html5 ${plantuml} ${output}$@
+
+checkdir:
+	[ -d "${dist_folder}" ] || mkdir ${dist_folder}
 
 clean:
-	rm -rf ./*.md ./plantuml-images
+	rm -rf ./${dist_folder}
