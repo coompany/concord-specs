@@ -43,6 +43,7 @@ opinions on it. Each node is itself a voter and everyone is free to participate
 in the voting process. Each voter is also responsible of verification of votes
 and votes counting.
 
+### Starting a Poll
 Whenever someone wants to start a poll, he / she has to send a `start_poll` RPC.
 This procedure contains the poll's question and its hash, computed from the text
 and a nonce. This hash is then used to build the **poll's Merkle tree** (details
