@@ -25,10 +25,10 @@ sources. The latter can be downloaded from the [official website](http://plantum
 and needs to be placed is this repository's root folder.
 
 ## Compilation
-This step is easily handled by `make`. Check the [Makefile](blob/master/Makefile).
+This step is easily handled by `make`. Check the [Makefile](Makefile).
 It also handles different files outputs and filters.
 
 ## Publication
-A [`publish.sh`](blob/master/publish.sh) script has been written that merges
+A [`publish.sh`](publish.sh) script has been written that merges
 changes from master into gh-pages branch, commits and pushes the changes to that
 branch.
