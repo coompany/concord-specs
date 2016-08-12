@@ -29,6 +29,8 @@ The node that starts the poll is responsible of sending the `start_poll` RPC to 
 
 After the TTL expires, each node participating in the poll has a key pair that can be used to vote the poll.
 
+![](graphviz-images/29dc914d54b99bd8dc825c9c6f747c3054b386b1.png)
+
  References
 -----------
 
