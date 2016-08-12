@@ -35,7 +35,6 @@
 <p><img src="plantuml-images/39b131e2d5b230832898068db3332fd2442e8965.png" /></p>
 <p>The node that starts the poll is responsible of sending the <code>start_poll</code> RPC to other nodes. To do so it has to send the RPC to all nodes that it knows about and sends the same request to other nodes that discovers through recursively call <code>find_node</code> on new nodes that discovers. Another strategy / extension could be to start searching for nodes randomly by generating a random <code>nodeId</code> starting a recursive lookup for that node and sending <code>start_poll</code> requests along the way. Nodes that decide to participate in the poll sends an <code>ack_poll</code> back to the node from which came to know about the poll. This RPC does not contain nodes and means that the node is taking responsibility to forward the <code>start_poll</code> message to its neighbors (all nodes that it knows about or only <span class="math inline"><em>k</em></span> closest neighbors are options). Nodes that do not want to participate in the poll send an <code>nack_poll</code> RPC containing its <span class="math inline"><em>k</em></span> closest nodes.</p>
 <p>After the TTL expires, each node participating in the poll has a key pair that can be used to vote the poll.</p>
-<p><img src="graphviz-images/29dc914d54b99bd8dc825c9c6f747c3054b386b1.png" /></p>
 <h2 id="references" class="unnumbered"> References</h2>
 <div id="refs" class="references">
 <div id="ref-baumgart2007s">
