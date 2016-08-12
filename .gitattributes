@@ -1,4 +1,4 @@
 *.bibtex linguist-language=Tex
 *.pdoc linguist-language=Markdown
-plantuml.py linguist-vendored
+*.py linguist-vendored
 dist linguist-vendored

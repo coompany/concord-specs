@@ -10,8 +10,16 @@ To compile this documentation (not only to markdown) you'll have to install Pand
 and two extensions: [`pandoc-citeproc`](https://github.com/jgm/pandoc-citeproc)
 and [`pandocfilters`](https://github.com/jgm/pandocfilters). To install Pandoc
 we remand to the official [installation page](http://pandoc.org/installing.html).
+
 `pandoc-citeproc` is distributed with the Linux x64 package of Pandoc, otherwise
 can be found in `apt` and `brew` or installed with `cabal install --global pandoc-citeproc`.
-`pandocfilters` can instead be installed with `pip install pandocfilters`. We will
-also need the plantuml jar file to enable writing UML diagrams in Pandoc files.
-The latter can be downloaded from the [official website](http://plantuml.com/download.html).
+
+`graphviz` is used for general charting and schemas and can most probably be
+found in your OS's package manager, so search for it there.
+
+`pandocfilters` can instead be installed along with the python-graphviz interface
+with `pip install -r pyreq.txt` (TODO change to the include paths of graphviz).
+
+We will also need the plantuml jar file to enable writing UML diagrams in Pandoc
+sources. The latter can be downloaded from the [official website](http://plantuml.com/download.html)
+and needs to be placed is this repository's root folder.
