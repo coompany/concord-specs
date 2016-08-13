@@ -1,6 +1,7 @@
 import hashlib
 import os
 import sys
+from pandocfilters import Str
 
 
 def get_filename4code(module, content, ext=None):
@@ -31,17 +32,20 @@ def get_caption(kv):
         ...
         return Para([Image([ident, [], keyvals], caption, [filename, typef])])
     """
+    caption, kv = get_value(kv, u"caption")
+    return [Str(caption)], "" if caption == "" else "fig:", kv
+
+
+def get_value(kv, key):
     res = []
-    caption = []
-    typef = ""
+    value = ""
     for k, v in kv:
-        if k == u"caption":
-            caption = [Str(v)]
-            typef = "fig:"
+        if k == key:
+            value = v
         else:
             res.append([k, v])
 
-    return caption, typef, res
+    return value, res
 
 
 def get_extension(format, default, **alternates):
