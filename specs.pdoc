@@ -36,6 +36,19 @@ node at the head). Let be $n$ the number of bits in the `nodeId`. Each node
 maintains $n$ k-buckets and each of them contains nodes at distance between $2^i$
 and $2^{i+1}$ $\forall i \in \{0,...,n-1\}$.
 
+~~~{.graphviz include="graphs/kademlia.dot" prog=dot}
+~~~~
+
+In the above Figure, we show Kademlia's DHT for nodeId `1100` in a network where
+the ID space is in 4 bits. Each color corresponds to a different k-bucket's range.
+In each k-bucket node IDs can be present or not (in the Figure, all nodes are
+shown as present) and each node maintains locally a list of $k$ nodes for each
+bucket. Note also that each k-bucket is responsible for progressively twice the
+number of node IDs when moving away from the local node's ID, that is
+$n_i = 2 n_{i-1} \forall i \in \{1,...,n-1\}$ and $n_0 = 1$ where $n_i$ is the
+number of possible node IDs in bucket $i$. By moving away from the current node ID,
+each k-bucket covers twice the number of node IDs.
+
 
 ## Voting Protocol
 The goal of this protocol is to allow anyone to create a poll and collect

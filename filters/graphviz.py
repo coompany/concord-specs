@@ -16,6 +16,9 @@ from pandocfilters import toJSONFilter, Para, Image
 from filter_utils import *
 
 
+def get_prog(kv):
+    return get_value(kv, u"prog")
+
 
 def graphviz(key, value, format, _):
     if key == 'CodeBlock':
@@ -26,9 +29,10 @@ def graphviz(key, value, format, _):
             dest = get_filename4code("graphviz", code, filetype)
 
             if not os.path.isfile(dest):
-                g = pygraphviz.AGraph(string=code)
+                g = pygraphviz.AGraph(string=code, strict=False)
                 g.layout()
-                g.draw(dest)
+                prog, keyvals = get_prog(keyvals)
+                g.draw(dest, prog=prog if prog != "" else None)
                 sys.stderr.write('Created image ' + dest + '\n')
 
             return Para([Image([ident, [], keyvals], caption, [dest, typef])])

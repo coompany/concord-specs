@@ -5,6 +5,10 @@ Sources of the specification are written in Pandoc's flavoured markdown and are
 compiled to Github's flavoured markdown so to be readable and hosted in the code
 repository directly.
 
+## Read it
+You can find all compiled files in the `gh-branch`, `dist` folder.
+In alternative you can check the [homepage](https://coompany.github.io/concord-specs/).
+
 ## Requirements
 To compile this documentation (not only to markdown) you'll have to install Pandoc
 and two extensions: [`pandoc-citeproc`](https://github.com/jgm/pandoc-citeproc)

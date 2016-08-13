@@ -1,0 +1,107 @@
+digraph G {
+  size = "10,10";
+  ranksep = ".6 equally";
+  nodesep = ".5";
+  ordering = "out";
+  node [shape=circle, height=0, label=""];
+  edge [splines=line, labeldistance=3, labelfontsize=22, dir=none];
+
+  root;
+  { rank = same; node0; node1 };
+  root -> node0 [headlabel="0"];
+  root -> node1 [headlabel="1"];
+
+  { rank = same; node00; node01; node10; node11 };
+  node0 -> node00 [headlabel="0", color=red, style=bold];
+  node0 -> node01 [headlabel="1", color=red, style=bold];
+  node1 -> node10 [headlabel="0"];
+  node1 -> node11 [headlabel="1"];
+
+  { rank = same; node000; node001; node010; node100; node110; node011;
+    node101; node111; };
+  node00 -> node000 [headlabel="0", color=red, style=bold];
+  node00 -> node001 [headlabel="1", color=red, style=bold];
+  node01 -> node010 [headlabel="0", color=red, style=bold];
+  node01 -> node011 [headlabel="1", color=red, style=bold];
+  node10 -> node100 [headlabel="0", color=blue, style=bold];
+  node10 -> node101 [headlabel="1", color=blue, style=bold];
+  node11 -> node110 [headlabel="0"];
+  node11 -> node111 [headlabel="1"];
+
+  node [style=filled, fillcolor="#EEEEEE", height=.2];
+  {
+    rank = same;
+    node [fillcolor=red];
+    node0000; node0001 [group=0001]; node0010; node0011; node0100 [group=0100];
+    node0101 [group=0101]; node0110 [group=0110]; node0111;
+    node [fillcolor=blue];
+    node1000 [group=1000]; node1001 [group=1001]; node1010 [group=1010]; node1011;
+    node1100 [fillcolor=black];
+    node1101 [fillcolor=yellow, group=1101];
+    node [fillcolor=green];
+    node1110 [group=1110]; node1111 [group=1111];
+  }
+  node000 -> node0000 [headlabel="0", color=red, style=bold];
+  node000 -> node0001 [headlabel="1", color=red, style=bold];
+  node001 -> node0010 [headlabel="0", color=red, style=bold];
+  node001 -> node0011 [headlabel="1", color=red, style=bold];
+  node010 -> node0100 [headlabel="0", color=red, style=bold];
+  node010 -> node0101 [headlabel="1", color=red, style=bold];
+  node011 -> node0110 [headlabel="0", color=red, style=bold];
+  node011 -> node0111 [headlabel="1", color=red, style=bold];
+  node100 -> node1000 [headlabel="0", color=blue, style=bold];
+  node100 -> node1001 [headlabel="1", color=blue, style=bold];
+  node101 -> node1010 [headlabel="0", color=blue, style=bold];
+  node101 -> node1011 [headlabel="1", color=blue, style=bold];
+  node110 -> node1100 [headlabel="0"];
+  node110 -> node1101 [headlabel="1"];
+  node111 -> node1110 [headlabel="0", color=green, style=bold];
+  node111 -> node1111 [headlabel="1", color=green, style=bold];
+
+  node1101 [fillcolor=yellow, height=.2, style=filled];
+  node111  [fillcolor=green, height=.2, style=filled];
+  node10   [fillcolor=blue, height=.2, style=filled];
+  node0    [fillcolor=red, height=.2, style=filled];
+
+  subgraph broadcast1 {
+    node [shape=box];
+    0100 [label=0100, group=0100];
+    1001 [label=1001, group=1001];
+    1101 [label=1101, group=1101];
+    1111 [label=1111, group=1111];
+    edge [style=dotted];
+    node0100 -> 0100;
+    node1001 -> 1001;
+    node1101 -> 1101;
+    node1111 -> 1111;
+    edge [color=violet, dir=forward, splines=curved, style=solid];
+    node1100 -> 0100;
+    node1100 -> 1001;
+    node1100 -> 1101;
+    node1100 -> 1111;
+  }
+
+  subgraph broadcast2 {
+    node [shape=box];
+    0101 [label=0101, group=0101];
+    0110 [label=0110, group=0110];
+    0001 [label=0001, group=0001];
+    1000 [label=1000, group=1000];
+    1010 [label=1010, group=1010];
+    1110 [label=1110, group=1110];
+    edge [style=dotted];
+    node0101 -> 0101;
+    node0110 -> 0110;
+    node0001 -> 0001;
+    node1000 -> 1000;
+    node1010 -> 1010;
+    node1110 -> 1110;
+    edge [color=violet, dir=forward, splines=curved, style=solid];
+    0100 -> 0001;
+    0100 -> 0101;
+    0100 -> 0110;
+    1001 -> 1000;
+    1001 -> 1010;
+    1111 -> 1110;
+  }
+}
