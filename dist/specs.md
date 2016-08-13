@@ -14,6 +14,10 @@ At the moment Concord implements only `ping` and `find_node` RPCs. This is becau
 
 Nodes are stored in a *DHT* (Distributed Hash Table). The local DHT is organized in *k-buckets*. For each bit in the `nodeId`, a node maintains a k-bucket, that is a FIFO list of nodes sorted with a last-seen policy (least recently seen node at the head). Let be *n* the number of bits in the `nodeId`. Each node maintains *n* k-buckets and each of them contains nodes at distance between 2<sup>*i*</sup> and 2<sup>*i* + 1</sup> ∀*i* ∈ {0, ..., *n* − 1}.
 
+<img src="graphviz-images/9cd4bbf1d4dd5d072de649081fb585394610eeb4.png" alt="" include="graphs/kademlia.dot" />
+
+In the above Figure, we show Kademlia's DHT for nodeId `1100` in a network where the ID space is in 4 bits. Each color corresponds to a different k-bucket's range. In each k-bucket node IDs can be present or not (in the Figure, all nodes are shown as present) and each node maintains locally a list of *k* nodes for each bucket. Note also that each k-bucket is responsible for progressively twice the number of node IDs when moving away from the local node's ID, that is *n*<sub>*i*</sub> = 2*n*<sub>*i* − 1</sub>∀*i* ∈ {1, ..., *n* − 1} and *n*<sub>0</sub> = 1 where *n*<sub>*i*</sub> is the number of possible node IDs in bucket *i*. By moving away from the current node ID, each k-bucket covers twice the number of node IDs.
+
 Voting Protocol
 ---------------
 
