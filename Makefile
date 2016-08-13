@@ -18,7 +18,7 @@ specs: checkdir specs.md specs.txt specs.html
 	${pandoc} $< ${citations} -t plain ${includes} ${output}$@
 
 %.html: %.pdoc
-	${pandoc} $< ${citations} -t html5 ${plantuml} ${includes} ${graphviz} ${output}$@
+	${pandoc} $< ${citations} -t html5 -c ../style.css ${plantuml} ${includes} ${graphviz} ${output}$@
 
 %.png: graphs/%.dot
 	dot -Tpng $< > /tmp/$@ && open /tmp/$@

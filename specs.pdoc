@@ -12,6 +12,13 @@ Based on *Kademlia* [@maymounkov2002kademlia] and its extension *S/Kademlia*
 a crypto puzzle. The puzzle generates also a key pair that is used to sign and
 verify integrity of messages.
 
+Kademlia builds a *structured overlay* network, so nodes connections are not
+built at random, but following the protocol's rules. Data (in a file-sharing
+application for example) and routing information are held in a
+*distributed hash table* (DHT). The word distributed means that global information
+are not held anywhere and any peer maintains a small portion of it; more specifically
+only the portion it is responsible for, again following the protocol's rules.
+
 Kademlia uses four RPCs for node / value lookup, routing table maintenance and
 storing values in the DHT:
 
@@ -29,12 +36,12 @@ because the other ones seem related to a file-sharing application. The future
 development of the voting protocol will tell us if and in what extent Concord
 will need to implement `store` and `find_value` procedures.
 
-Nodes are stored in a *DHT* (Distributed Hash Table). The local DHT is organized
-in *k-buckets*. For each bit in the `nodeId`, a node maintains a k-bucket, that
-is a FIFO list of nodes sorted with a last-seen policy (least recently seen
-node at the head). Let be $n$ the number of bits in the `nodeId`. Each node
-maintains $n$ k-buckets and each of them contains nodes at distance between $2^i$
-and $2^{i+1}$ $\forall i \in \{0,...,n-1\}$.
+Nodes are stored in a DHT. The local DHT is organized in *k-buckets*. For each
+bit in the `nodeId`, a node maintains a k-bucket, that is a FIFO list of nodes
+sorted with a last-seen policy (least recently seen node at the head). Let be
+$n$ the number of bits in the `nodeId`. Each node maintains $n$ k-buckets and
+each of them contains nodes at distance between $2^i$ and $2^{i+1}$
+$\forall i \in \{0,...,n-1\}$.
 
 ~~~{.graphviz include="graphs/kademlia.dot" prog=dot}
 ~~~~
@@ -48,6 +55,34 @@ number of node IDs when moving away from the local node's ID, that is
 $n_i = 2 n_{i-1} \forall i \in \{1,...,n-1\}$ and $n_0 = 1$ where $n_i$ is the
 number of possible node IDs in bucket $i$. By moving away from the current node ID,
 each k-bucket covers twice the number of node IDs.
+
+### Broadcasting
+This term is used to mean a *one to all* communication originating at a single
+node. Broadcasting is for example used in BitTorrent to announce to other peers
+when a node starts downloading a file, in Concord it is used to announce a new
+poll. The problem of efficient broadcasting (that is, with a minimum number of
+messages) has been tackled in [@el2003efficient]. The paper focuses on Chord's
+DHT and overlay structure, but gives great hindsights on the subject.
+[@czirkos2010enhancing] and [@czirkos2013solution] expand on the same idea, with
+a focus instead on Kademlia. The broadcasting algorithm exploits the network
+structure so to optimize the number of messages exchanged. The basic idea is an
+application of the divide-et-impera strategy: each node at each round is
+responsible for a smaller subtree than nodes at the previous round.
+
+~~~~{.graphviz include="graphs/kademlia_broadcast.dot" prog=dot}
+~~~~
+
+The Figure above shows an example execution of the broadcast algorithm with node
+`1100` as the initiator. It starts the procedure by sending the message to a
+randomly selected node for each k-bucket. Each of the contacted node is then
+responsible for the subtree referenced by the k-bucket it belongs to. Each
+message contains also the height of the tree the receiving node is responsible
+for. Recursively then each of those nodes forwards the message to a randomly
+selected node in each of its k-buckets among those that reference nodes at the
+height it is responsible for (contained in the message originally received).
+When forwarding the message, each node increases the height field in the
+message, in order to limit the responsibility of the receiving node, based on
+its distance from the sender.
 
 
 ## Voting Protocol
