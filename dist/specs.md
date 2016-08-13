@@ -3,6 +3,8 @@ Network Protocol
 
 Based on *Kademlia* (Maymounkov and Mazieres 2002) and its extension *S/Kademlia* (Baumgart and Mies 2007). Each node is identified by a `nodeId` which is computed using a crypto puzzle. The puzzle generates also a key pair that is used to sign and verify integrity of messages.
 
+Kademlia builds a *structured overlay* network, so nodes connections are not built at random, but following the protocol's rules. Data (in a file-sharing application for example) and routing information are held in a *distributed hash table* (DHT). The word distributed means that global information are not held anywhere and any peer maintains a small portion of it; more specifically only the portion it is responsible for, again following the protocol's rules.
+
 Kademlia uses four RPCs for node / value lookup, routing table maintenance and storing values in the DHT:
 
 -   `ping`: usual ping / pong request to check liveness of nodes;
@@ -12,11 +14,19 @@ Kademlia uses four RPCs for node / value lookup, routing table maintenance and s
 
 At the moment Concord implements only `ping` and `find_node` RPCs. This is because the other ones seem related to a file-sharing application. The future development of the voting protocol will tell us if and in what extent Concord will need to implement `store` and `find_value` procedures.
 
-Nodes are stored in a *DHT* (Distributed Hash Table). The local DHT is organized in *k-buckets*. For each bit in the `nodeId`, a node maintains a k-bucket, that is a FIFO list of nodes sorted with a last-seen policy (least recently seen node at the head). Let be *n* the number of bits in the `nodeId`. Each node maintains *n* k-buckets and each of them contains nodes at distance between 2<sup>*i*</sup> and 2<sup>*i* + 1</sup> ∀*i* ∈ {0, ..., *n* − 1}.
+Nodes are stored in a DHT. The local DHT is organized in *k-buckets*. For each bit in the `nodeId`, a node maintains a k-bucket, that is a FIFO list of nodes sorted with a last-seen policy (least recently seen node at the head). Let be *n* the number of bits in the `nodeId`. Each node maintains *n* k-buckets and each of them contains nodes at distance between 2<sup>*i*</sup> and 2<sup>*i* + 1</sup> ∀*i* ∈ {0, ..., *n* − 1}.
 
 <img src="graphviz-images/9cd4bbf1d4dd5d072de649081fb585394610eeb4.png" alt="" include="graphs/kademlia.dot" />
 
 In the above Figure, we show Kademlia's DHT for nodeId `1100` in a network where the ID space is in 4 bits. Each color corresponds to a different k-bucket's range. In each k-bucket node IDs can be present or not (in the Figure, all nodes are shown as present) and each node maintains locally a list of *k* nodes for each bucket. Note also that each k-bucket is responsible for progressively twice the number of node IDs when moving away from the local node's ID, that is *n*<sub>*i*</sub> = 2*n*<sub>*i* − 1</sub>∀*i* ∈ {1, ..., *n* − 1} and *n*<sub>0</sub> = 1 where *n*<sub>*i*</sub> is the number of possible node IDs in bucket *i*. By moving away from the current node ID, each k-bucket covers twice the number of node IDs.
+
+### Broadcasting
+
+This term is used to mean a *one to all* communication originating at a single node. Broadcasting is for example used in BitTorrent to announce to other peers when a node starts downloading a file, in Concord it is used to announce a new poll. The problem of efficient broadcasting (that is, with a minimum number of messages) has been tackled in (El-Ansary et al. 2003). The paper focuses on Chord's DHT and overlay structure, but gives great hindsights on the subject. (Zoltdn Czirkos and Hosszu 2010) and (Zoltán Czirkos and Hosszú 2013) expand on the same idea, with a focus instead on Kademlia. The broadcasting algorithm exploits the network structure so to optimize the number of messages exchanged. The basic idea is an application of the divide-et-impera strategy: each node at each round is responsible for a smaller subtree than nodes at the previous round.
+
+<img src="graphviz-images/cc05bbe1f2acc09ae6181affe2eef5b331e97080.png" alt="" include="graphs/kademlia_broadcast.dot" />
+
+The Figure above shows an example execution of the broadcast algorithm with node `1100` as the initiator. It starts the procedure by sending the message to a randomly selected node for each k-bucket. Each of the contacted node is then responsible for the subtree referenced by the k-bucket it belongs to. Each message contains also the height of the tree the receiving node is responsible for. Recursively then each of those nodes forwards the message to a randomly selected node in each of its k-buckets among those that reference nodes at the height it is responsible for (contained in the message originally received). When forwarding the message, each node increases the height field in the message, in order to limit the responsibility of the receiving node, based on its distance from the sender.
 
 Voting Protocol
 ---------------
@@ -37,5 +47,11 @@ After the TTL expires, each node participating in the poll has a key pair that c
 -----------
 
 Baumgart, Ingmar, and Sebastian Mies. 2007. “S/Kademlia: A Practicable Approach Towards Secure Key-Based Routing.” In *Parallel and Distributed Systems, 2007 International Conference on*, 2:1–8. IEEE.
+
+Czirkos, Zoltán, and Gábor Hosszú. 2013. “Solution for the Broadcasting in the Kademlia Peer-to-Peer Overlay.” *Computer Networks* 57 (8). Elsevier: 1853–62.
+
+Czirkos, Zoltdn, and Gdbor Hosszu. 2010. “Enhancing the Kademlia P 2 P Network.” *Periodica Polytechnica, Electrical Engineering* 54 (3-4). Budapest University of Technology and Economics: 87–92.
+
+El-Ansary, Sameh, Luc Onana Alima, Per Brand, and Seif Haridi. 2003. “Efficient Broadcast in Structured P2p Networks.” In *International Workshop on Peer-to-Peer Systems*, 304–14. Springer.
 
 Maymounkov, Petar, and David Mazieres. 2002. “Kademlia: A Peer-to-Peer Information System Based on the Xor Metric.” In *International Workshop on Peer-to-Peer Systems*, 53–65. Springer.

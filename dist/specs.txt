@@ -8,6 +8,14 @@ _S/Kademlia_ (Baumgart and Mies 2007). Each node is identified by a
 nodeId which is computed using a crypto puzzle. The puzzle generates
 also a key pair that is used to sign and verify integrity of messages.
 
+Kademlia builds a _structured overlay_ network, so nodes connections are
+not built at random, but following the protocol's rules. Data (in a
+file-sharing application for example) and routing information are held
+in a _distributed hash table_ (DHT). The word distributed means that
+global information are not held anywhere and any peer maintains a small
+portion of it; more specifically only the portion it is responsible for,
+again following the protocol's rules.
+
 Kademlia uses four RPCs for node / value lookup, routing table
 maintenance and storing values in the DHT:
 
@@ -25,12 +33,12 @@ because the other ones seem related to a file-sharing application. The
 future development of the voting protocol will tell us if and in what
 extent Concord will need to implement store and find_value procedures.
 
-Nodes are stored in a _DHT_ (Distributed Hash Table). The local DHT is
-organized in _k-buckets_. For each bit in the nodeId, a node maintains a
-k-bucket, that is a FIFO list of nodes sorted with a last-seen policy
-(least recently seen node at the head). Let be n the number of bits in
-the nodeId. Each node maintains n k-buckets and each of them contains
-nodes at distance between 2i and 2i + 1 ∀i ∈ {0, ..., n − 1}.
+Nodes are stored in a DHT. The local DHT is organized in _k-buckets_.
+For each bit in the nodeId, a node maintains a k-bucket, that is a FIFO
+list of nodes sorted with a last-seen policy (least recently seen node
+at the head). Let be n the number of bits in the nodeId. Each node
+maintains n k-buckets and each of them contains nodes at distance
+between 2i and 2i + 1 ∀i ∈ {0, ..., n − 1}.
 
     digraph G {
       size = "10,10";
@@ -109,6 +117,143 @@ ni = 2ni − 1∀i ∈ {1, ..., n − 1} and n₀ = 1 wh
 possible node IDs in bucket i. By moving away from the current node ID,
 each k-bucket covers twice the number of node IDs.
 
+Broadcasting
+
+This term is used to mean a _one to all_ communication originating at a
+single node. Broadcasting is for example used in BitTorrent to announce
+to other peers when a node starts downloading a file, in Concord it is
+used to announce a new poll. The problem of efficient broadcasting (that
+is, with a minimum number of messages) has been tackled in (El-Ansary et
+al. 2003). The paper focuses on Chord's DHT and overlay structure, but
+gives great hindsights on the subject. (Zoltdn Czirkos and Hosszu 2010)
+and (Zoltán Czirkos and Hosszú 2013) expand on the same idea, with a
+focus instead on Kademlia. The broadcasting algorithm exploits the
+network structure so to optimize the number of messages exchanged. The
+basic idea is an application of the divide-et-impera strategy: each node
+at each round is responsible for a smaller subtree than nodes at the
+previous round.
+
+    digraph G {
+      size = "10,10";
+      ranksep = ".6 equally";
+      nodesep = ".5";
+      ordering = "out";
+      node [shape=circle, height=0, label=""];
+      edge [splines=line, labeldistance=3, labelfontsize=22, dir=none];
+
+      root;
+      { rank = same; node0; node1 };
+      root -> node0 [headlabel="0"];
+      root -> node1 [headlabel="1"];
+
+      { rank = same; node00; node01; node10; node11 };
+      node0 -> node00 [headlabel="0", color=red, style=bold];
+      node0 -> node01 [headlabel="1", color=red, style=bold];
+      node1 -> node10 [headlabel="0"];
+      node1 -> node11 [headlabel="1"];
+
+      { rank = same; node000; node001; node010; node100; node110; node011;
+        node101; node111; };
+      node00 -> node000 [headlabel="0", color=red, style=bold];
+      node00 -> node001 [headlabel="1", color=red, style=bold];
+      node01 -> node010 [headlabel="0", color=red, style=bold];
+      node01 -> node011 [headlabel="1", color=red, style=bold];
+      node10 -> node100 [headlabel="0", color=blue, style=bold];
+      node10 -> node101 [headlabel="1", color=blue, style=bold];
+      node11 -> node110 [headlabel="0"];
+      node11 -> node111 [headlabel="1"];
+
+      node [style=filled, fillcolor="#EEEEEE", height=.2];
+      {
+        rank = same;
+        node [fillcolor=red];
+        node0000; node0001 [group=0001]; node0010; node0011; node0100 [group=0100];
+        node0101 [group=0101]; node0110 [group=0110]; node0111;
+        node [fillcolor=blue];
+        node1000 [group=1000]; node1001 [group=1001]; node1010 [group=1010]; node1011;
+        node1100 [fillcolor=black];
+        node1101 [fillcolor=yellow, group=1101];
+        node [fillcolor=green];
+        node1110 [group=1110]; node1111 [group=1111];
+      }
+      node000 -> node0000 [headlabel="0", color=red, style=bold];
+      node000 -> node0001 [headlabel="1", color=red, style=bold];
+      node001 -> node0010 [headlabel="0", color=red, style=bold];
+      node001 -> node0011 [headlabel="1", color=red, style=bold];
+      node010 -> node0100 [headlabel="0", color=red, style=bold];
+      node010 -> node0101 [headlabel="1", color=red, style=bold];
+      node011 -> node0110 [headlabel="0", color=red, style=bold];
+      node011 -> node0111 [headlabel="1", color=red, style=bold];
+      node100 -> node1000 [headlabel="0", color=blue, style=bold];
+      node100 -> node1001 [headlabel="1", color=blue, style=bold];
+      node101 -> node1010 [headlabel="0", color=blue, style=bold];
+      node101 -> node1011 [headlabel="1", color=blue, style=bold];
+      node110 -> node1100 [headlabel="0"];
+      node110 -> node1101 [headlabel="1"];
+      node111 -> node1110 [headlabel="0", color=green, style=bold];
+      node111 -> node1111 [headlabel="1", color=green, style=bold];
+
+      node1101 [fillcolor=yellow, height=.2, style=filled];
+      node111  [fillcolor=green, height=.2, style=filled];
+      node10   [fillcolor=blue, height=.2, style=filled];
+      node0    [fillcolor=red, height=.2, style=filled];
+
+      subgraph broadcast1 {
+        node [shape=box];
+        0100 [label=0100, group=0100];
+        1001 [label=1001, group=1001];
+        1101 [label=1101, group=1101];
+        1111 [label=1111, group=1111];
+        edge [style=dotted];
+        node0100 -> 0100;
+        node1001 -> 1001;
+        node1101 -> 1101;
+        node1111 -> 1111;
+        edge [color=violet, dir=forward, splines=curved, style=solid];
+        node1100 -> 0100;
+        node1100 -> 1001;
+        node1100 -> 1101;
+        node1100 -> 1111;
+      }
+
+      subgraph broadcast2 {
+        node [shape=box];
+        0101 [label=0101, group=0101];
+        0110 [label=0110, group=0110];
+        0001 [label=0001, group=0001];
+        1000 [label=1000, group=1000];
+        1010 [label=1010, group=1010];
+        1110 [label=1110, group=1110];
+        edge [style=dotted];
+        node0101 -> 0101;
+        node0110 -> 0110;
+        node0001 -> 0001;
+        node1000 -> 1000;
+        node1010 -> 1010;
+        node1110 -> 1110;
+        edge [color=violet, dir=forward, splines=curved, style=solid];
+        0100 -> 0001;
+        0100 -> 0101;
+        0100 -> 0110;
+        1001 -> 1000;
+        1001 -> 1010;
+        1111 -> 1110;
+      }
+    }
+
+The Figure above shows an example execution of the broadcast algorithm
+with node 1100 as the initiator. It starts the procedure by sending the
+message to a randomly selected node for each k-bucket. Each of the
+contacted node is then responsible for the subtree referenced by the
+k-bucket it belongs to. Each message contains also the height of the
+tree the receiving node is responsible for. Recursively then each of
+those nodes forwards the message to a randomly selected node in each of
+its k-buckets among those that reference nodes at the height it is
+responsible for (contained in the message originally received). When
+forwarding the message, each node increases the height field in the
+message, in order to limit the responsibility of the receiving node,
+based on its distance from the sender.
+
 
 Voting Protocol
 
@@ -171,6 +316,18 @@ pair that can be used to vote the poll.
 Baumgart, Ingmar, and Sebastian Mies. 2007. “S/Kademlia: A Practicable
 Approach Towards Secure Key-Based Routing.” In _Parallel and Distributed
 Systems, 2007 International Conference on_, 2:1–8. IEEE.
+
+Czirkos, Zoltán, and Gábor Hosszú. 2013. “Solution for the Broadcasting
+in the Kademlia Peer-to-Peer Overlay.” _Computer Networks_ 57 (8).
+Elsevier: 1853–62.
+
+Czirkos, Zoltdn, and Gdbor Hosszu. 2010. “Enhancing the Kademlia P 2 P
+Network.” _Periodica Polytechnica, Electrical Engineering_ 54 (3-4).
+Budapest University of Technology and Economics: 87–92.
+
+El-Ansary, Sameh, Luc Onana Alima, Per Brand, and Seif Haridi. 2003.
+“Efficient Broadcast in Structured P2p Networks.” In _International
+Workshop on Peer-to-Peer Systems_, 304–14. Springer.
 
 Maymounkov, Petar, and David Mazieres. 2002. “Kademlia: A Peer-to-Peer
 Information System Based on the Xor Metric.” In _International Workshop

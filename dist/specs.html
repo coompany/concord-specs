@@ -7,6 +7,7 @@
   <meta name="author" content="acidghost">
   <title>Concord</title>
   <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../style.css">
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -19,6 +20,7 @@
 </header>
 <h2 id="network-protocol">Network Protocol</h2>
 <p>Based on <em>Kademlia</em> <span class="citation" data-cites="maymounkov2002kademlia">(Maymounkov and Mazieres 2002)</span> and its extension <em>S/Kademlia</em> <span class="citation" data-cites="baumgart2007s">(Baumgart and Mies 2007)</span>. Each node is identified by a <code>nodeId</code> which is computed using a crypto puzzle. The puzzle generates also a key pair that is used to sign and verify integrity of messages.</p>
+<p>Kademlia builds a <em>structured overlay</em> network, so nodes connections are not built at random, but following the protocol's rules. Data (in a file-sharing application for example) and routing information are held in a <em>distributed hash table</em> (DHT). The word distributed means that global information are not held anywhere and any peer maintains a small portion of it; more specifically only the portion it is responsible for, again following the protocol's rules.</p>
 <p>Kademlia uses four RPCs for node / value lookup, routing table maintenance and storing values in the DHT:</p>
 <ul>
 <li><code>ping</code>: usual ping / pong request to check liveness of nodes;</li>
@@ -27,9 +29,13 @@
 <li><code>find_value</code>: behaves like <code>find_node</code> with the exception that if the target node has previously received a <code>store</code> request for the target key, it will return the stored value directly.</li>
 </ul>
 <p>At the moment Concord implements only <code>ping</code> and <code>find_node</code> RPCs. This is because the other ones seem related to a file-sharing application. The future development of the voting protocol will tell us if and in what extent Concord will need to implement <code>store</code> and <code>find_value</code> procedures.</p>
-<p>Nodes are stored in a <em>DHT</em> (Distributed Hash Table). The local DHT is organized in <em>k-buckets</em>. For each bit in the <code>nodeId</code>, a node maintains a k-bucket, that is a FIFO list of nodes sorted with a last-seen policy (least recently seen node at the head). Let be <span class="math inline"><em>n</em></span> the number of bits in the <code>nodeId</code>. Each node maintains <span class="math inline"><em>n</em></span> k-buckets and each of them contains nodes at distance between <span class="math inline">2<sup><em>i</em></sup></span> and <span class="math inline">2<sup><em>i</em> + 1</sup></span> <span class="math inline">∀<em>i</em> ∈ {0, ..., <em>n</em> − 1}</span>.</p>
+<p>Nodes are stored in a DHT. The local DHT is organized in <em>k-buckets</em>. For each bit in the <code>nodeId</code>, a node maintains a k-bucket, that is a FIFO list of nodes sorted with a last-seen policy (least recently seen node at the head). Let be <span class="math inline"><em>n</em></span> the number of bits in the <code>nodeId</code>. Each node maintains <span class="math inline"><em>n</em></span> k-buckets and each of them contains nodes at distance between <span class="math inline">2<sup><em>i</em></sup></span> and <span class="math inline">2<sup><em>i</em> + 1</sup></span> <span class="math inline">∀<em>i</em> ∈ {0, ..., <em>n</em> − 1}</span>.</p>
 <p><img src="graphviz-images/9cd4bbf1d4dd5d072de649081fb585394610eeb4.png" alt="" include="graphs/kademlia.dot" prog="dot" /></p>
 <p>In the above Figure, we show Kademlia's DHT for nodeId <code>1100</code> in a network where the ID space is in 4 bits. Each color corresponds to a different k-bucket's range. In each k-bucket node IDs can be present or not (in the Figure, all nodes are shown as present) and each node maintains locally a list of <span class="math inline"><em>k</em></span> nodes for each bucket. Note also that each k-bucket is responsible for progressively twice the number of node IDs when moving away from the local node's ID, that is <span class="math inline"><em>n</em><sub><em>i</em></sub> = 2<em>n</em><sub><em>i</em> − 1</sub>∀<em>i</em> ∈ {1, ..., <em>n</em> − 1}</span> and <span class="math inline"><em>n</em><sub>0</sub> = 1</span> where <span class="math inline"><em>n</em><sub><em>i</em></sub></span> is the number of possible node IDs in bucket <span class="math inline"><em>i</em></span>. By moving away from the current node ID, each k-bucket covers twice the number of node IDs.</p>
+<h3 id="broadcasting">Broadcasting</h3>
+<p>This term is used to mean a <em>one to all</em> communication originating at a single node. Broadcasting is for example used in BitTorrent to announce to other peers when a node starts downloading a file, in Concord it is used to announce a new poll. The problem of efficient broadcasting (that is, with a minimum number of messages) has been tackled in <span class="citation" data-cites="el2003efficient">(El-Ansary et al. 2003)</span>. The paper focuses on Chord's DHT and overlay structure, but gives great hindsights on the subject. <span class="citation" data-cites="czirkos2010enhancing">(Zoltdn Czirkos and Hosszu 2010)</span> and <span class="citation" data-cites="czirkos2013solution">(Zoltán Czirkos and Hosszú 2013)</span> expand on the same idea, with a focus instead on Kademlia. The broadcasting algorithm exploits the network structure so to optimize the number of messages exchanged. The basic idea is an application of the divide-et-impera strategy: each node at each round is responsible for a smaller subtree than nodes at the previous round.</p>
+<p><img src="graphviz-images/cc05bbe1f2acc09ae6181affe2eef5b331e97080.png" alt="" include="graphs/kademlia_broadcast.dot" prog="dot" /></p>
+<p>The Figure above shows an example execution of the broadcast algorithm with node <code>1100</code> as the initiator. It starts the procedure by sending the message to a randomly selected node for each k-bucket. Each of the contacted node is then responsible for the subtree referenced by the k-bucket it belongs to. Each message contains also the height of the tree the receiving node is responsible for. Recursively then each of those nodes forwards the message to a randomly selected node in each of its k-buckets among those that reference nodes at the height it is responsible for (contained in the message originally received). When forwarding the message, each node increases the height field in the message, in order to limit the responsibility of the receiving node, based on its distance from the sender.</p>
 <h2 id="voting-protocol">Voting Protocol</h2>
 <p>The goal of this protocol is to allow anyone to create a poll and collect opinions on it. Each node is itself a voter and everyone is free to participate in the voting process. Each voter is also responsible of verification of votes and votes counting.</p>
 <h3 id="starting-a-poll">Starting a Poll</h3>
@@ -41,6 +47,15 @@
 <div id="refs" class="references">
 <div id="ref-baumgart2007s">
 <p>Baumgart, Ingmar, and Sebastian Mies. 2007. “S/Kademlia: A Practicable Approach Towards Secure Key-Based Routing.” In <em>Parallel and Distributed Systems, 2007 International Conference on</em>, 2:1–8. IEEE.</p>
+</div>
+<div id="ref-czirkos2013solution">
+<p>Czirkos, Zoltán, and Gábor Hosszú. 2013. “Solution for the Broadcasting in the Kademlia Peer-to-Peer Overlay.” <em>Computer Networks</em> 57 (8). Elsevier: 1853–62.</p>
+</div>
+<div id="ref-czirkos2010enhancing">
+<p>Czirkos, Zoltdn, and Gdbor Hosszu. 2010. “Enhancing the Kademlia P 2 P Network.” <em>Periodica Polytechnica, Electrical Engineering</em> 54 (3-4). Budapest University of Technology and Economics: 87–92.</p>
+</div>
+<div id="ref-el2003efficient">
+<p>El-Ansary, Sameh, Luc Onana Alima, Per Brand, and Seif Haridi. 2003. “Efficient Broadcast in Structured P2p Networks.” In <em>International Workshop on Peer-to-Peer Systems</em>, 304–14. Springer.</p>
 </div>
 <div id="ref-maymounkov2002kademlia">
 <p>Maymounkov, Petar, and David Mazieres. 2002. “Kademlia: A Peer-to-Peer Information System Based on the Xor Metric.” In <em>International Workshop on Peer-to-Peer Systems</em>, 53–65. Springer.</p>
