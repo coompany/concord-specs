@@ -33,6 +33,6 @@ This step is easily handled by `make`. Check the [Makefile](Makefile).
 It also handles different files outputs and filters.
 
 ## Publication
-A [`publish.sh`](publish.sh) script has been written that merges
+A publishing script has been included in the Makefile (`make public`) that merges
 changes from master into gh-pages branch, commits and pushes the changes to that
 branch.
