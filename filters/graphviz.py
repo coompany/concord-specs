@@ -29,7 +29,7 @@ def graphviz(key, value, format, _):
             dest = get_filename4code("graphviz", code, filetype)
 
             if not os.path.isfile(dest):
-                g = pygraphviz.AGraph(string=code, strict=False)
+                g = pygraphviz.AGraph(string=code)
                 g.layout()
                 prog, keyvals = get_prog(keyvals)
                 g.draw(dest, prog=prog if prog != "" else None)
