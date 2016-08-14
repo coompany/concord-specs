@@ -26,5 +26,10 @@ specs: checkdir specs.md specs.txt specs.html
 checkdir:
 	[ -d "${dist_folder}" ] || mkdir ${dist_folder}
 
+public:
+	git checkout master && git pull origin master && git checkout gh-pages && \
+		git merge master && make && git add --force dist && git commit && \
+		git push origin gh-pages && git checkout master
+
 clean:
 	rm -rf ./${dist_folder}
