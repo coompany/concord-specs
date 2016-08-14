@@ -8,7 +8,7 @@ output=-o ${dist_folder}/
 
 all: clean specs
 
-specs: checkdir specs.md specs.txt specs.html
+specs: checkdir specs.md specs.txt specs.html specs.pdf
 	mv *-images ${dist_folder}/
 
 %.md: %.pdoc
@@ -19,6 +19,9 @@ specs: checkdir specs.md specs.txt specs.html
 
 %.html: %.pdoc
 	${pandoc} $< ${citations} -t html5 --mathjax -c ../style.css ${plantuml} ${includes} ${graphviz} ${output}$@
+
+%.pdf: %.pdoc
+	${pandoc} $< ${citations} -t latex ${plantuml} ${includes} ${graphviz} ${output}$@
 
 %.png: graphs/%.dot
 	dot -Tpng $< > /tmp/$@ && open /tmp/$@
