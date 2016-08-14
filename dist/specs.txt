@@ -54,56 +54,56 @@ between 2i and 2i + 1 ∀i ∈ {0, ..., n − 1}.
       root -> node1 [headlabel="1"];
 
       { rank = same; node00; node01; node10; node11 };
-      node0 -> node00 [headlabel="0", color=red, style=bold];
-      node0 -> node01 [headlabel="1", color=red, style=bold];
+      node0 -> node00 [headlabel="0", color="/set16/1", style=bold];
+      node0 -> node01 [headlabel="1", color="/set16/1", style=bold];
       node1 -> node10 [headlabel="0"];
       node1 -> node11 [headlabel="1"];
 
       { rank = same; node000; node001; node010; node100; node110; node011;
         node101; node111; };
-      node00 -> node000 [headlabel="0", color=red, style=bold];
-      node00 -> node001 [headlabel="1", color=red, style=bold];
-      node01 -> node010 [headlabel="0", color=red, style=bold];
-      node01 -> node011 [headlabel="1", color=red, style=bold];
-      node10 -> node100 [headlabel="0", color=blue, style=bold];
-      node10 -> node101 [headlabel="1", color=blue, style=bold];
+      node00 -> node000 [headlabel="0", color="/set16/1", style=bold];
+      node00 -> node001 [headlabel="1", color="/set16/1", style=bold];
+      node01 -> node010 [headlabel="0", color="/set16/1", style=bold];
+      node01 -> node011 [headlabel="1", color="/set16/1", style=bold];
+      node10 -> node100 [headlabel="0", color="/set16/2", style=bold];
+      node10 -> node101 [headlabel="1", color="/set16/2", style=bold];
       node11 -> node110 [headlabel="0"];
       node11 -> node111 [headlabel="1"];
 
       node [style=filled, fillcolor="#EEEEEE", height=.2];
       {
         rank = same;
-        node [fillcolor=red];
+        node [fillcolor="/set16/1"];
         node0000; node0001 [group=0001]; node0010; node0011; node0100 [group=0100];
         node0101 [group=0101]; node0110 [group=0110]; node0111;
-        node [fillcolor=blue];
+        node [fillcolor="/set16/2"];
         node1000 [group=1000]; node1001 [group=1001]; node1010 [group=1010]; node1011;
         node1100 [fillcolor=black];
-        node1101 [fillcolor=yellow, group=1101];
-        node [fillcolor=green];
+        node1101 [fillcolor="/set16/4", group=1101];
+        node [fillcolor="/set16/3"];
         node1110 [group=1110]; node1111 [group=1111];
       }
-      node000 -> node0000 [headlabel="0", color=red, style=bold];
-      node000 -> node0001 [headlabel="1", color=red, style=bold];
-      node001 -> node0010 [headlabel="0", color=red, style=bold];
-      node001 -> node0011 [headlabel="1", color=red, style=bold];
-      node010 -> node0100 [headlabel="0", color=red, style=bold];
-      node010 -> node0101 [headlabel="1", color=red, style=bold];
-      node011 -> node0110 [headlabel="0", color=red, style=bold];
-      node011 -> node0111 [headlabel="1", color=red, style=bold];
-      node100 -> node1000 [headlabel="0", color=blue, style=bold];
-      node100 -> node1001 [headlabel="1", color=blue, style=bold];
-      node101 -> node1010 [headlabel="0", color=blue, style=bold];
-      node101 -> node1011 [headlabel="1", color=blue, style=bold];
+      node000 -> node0000 [headlabel="0", color="/set16/1", style=bold];
+      node000 -> node0001 [headlabel="1", color="/set16/1", style=bold];
+      node001 -> node0010 [headlabel="0", color="/set16/1", style=bold];
+      node001 -> node0011 [headlabel="1", color="/set16/1", style=bold];
+      node010 -> node0100 [headlabel="0", color="/set16/1", style=bold];
+      node010 -> node0101 [headlabel="1", color="/set16/1", style=bold];
+      node011 -> node0110 [headlabel="0", color="/set16/1", style=bold];
+      node011 -> node0111 [headlabel="1", color="/set16/1", style=bold];
+      node100 -> node1000 [headlabel="0", color="/set16/2", style=bold];
+      node100 -> node1001 [headlabel="1", color="/set16/2", style=bold];
+      node101 -> node1010 [headlabel="0", color="/set16/2", style=bold];
+      node101 -> node1011 [headlabel="1", color="/set16/2", style=bold];
       node110 -> node1100 [headlabel="0"];
       node110 -> node1101 [headlabel="1"];
-      node111 -> node1110 [headlabel="0", color=green, style=bold];
-      node111 -> node1111 [headlabel="1", color=green, style=bold];
+      node111 -> node1110 [headlabel="0", color="/set16/3", style=bold];
+      node111 -> node1111 [headlabel="1", color="/set16/3", style=bold];
 
-      node1101 [fillcolor=yellow, height=.2, style=filled];
-      node111  [fillcolor=green, height=.2, style=filled];
-      node10   [fillcolor=blue, height=.2, style=filled];
-      node0    [fillcolor=red, height=.2, style=filled];
+      node1101 [fillcolor="/set16/4", height=.2, style=filled];
+      node111  [fillcolor="/set16/3", height=.2, style=filled];
+      node10   [fillcolor="/set16/2", height=.2, style=filled];
+      node0    [fillcolor="/set16/1", height=.2, style=filled];
     }
 
 In the above Figure, we show Kademlia's DHT for nodeId 1100 in a network
@@ -147,56 +147,56 @@ previous round.
       root -> node1 [headlabel="1"];
 
       { rank = same; node00; node01; node10; node11 };
-      node0 -> node00 [headlabel="0", color=red, style=bold];
-      node0 -> node01 [headlabel="1", color=red, style=bold];
+      node0 -> node00 [headlabel="0", color="/set16/1", style=bold];
+      node0 -> node01 [headlabel="1", color="/set16/1", style=bold];
       node1 -> node10 [headlabel="0"];
       node1 -> node11 [headlabel="1"];
 
       { rank = same; node000; node001; node010; node100; node110; node011;
         node101; node111; };
-      node00 -> node000 [headlabel="0", color=red, style=bold];
-      node00 -> node001 [headlabel="1", color=red, style=bold];
-      node01 -> node010 [headlabel="0", color=red, style=bold];
-      node01 -> node011 [headlabel="1", color=red, style=bold];
-      node10 -> node100 [headlabel="0", color=blue, style=bold];
-      node10 -> node101 [headlabel="1", color=blue, style=bold];
+      node00 -> node000 [headlabel="0", color="/set16/1", style=bold];
+      node00 -> node001 [headlabel="1", color="/set16/1", style=bold];
+      node01 -> node010 [headlabel="0", color="/set16/1", style=bold];
+      node01 -> node011 [headlabel="1", color="/set16/1", style=bold];
+      node10 -> node100 [headlabel="0", color="/set16/2", style=bold];
+      node10 -> node101 [headlabel="1", color="/set16/2", style=bold];
       node11 -> node110 [headlabel="0"];
       node11 -> node111 [headlabel="1"];
 
       node [style=filled, fillcolor="#EEEEEE", height=.2];
       {
         rank = same;
-        node [fillcolor=red];
+        node [fillcolor="/set16/1"];
         node0000; node0001 [group=0001]; node0010; node0011; node0100 [group=0100];
         node0101 [group=0101]; node0110 [group=0110]; node0111;
-        node [fillcolor=blue];
+        node [fillcolor="/set16/2"];
         node1000 [group=1000]; node1001 [group=1001]; node1010 [group=1010]; node1011;
         node1100 [fillcolor=black];
-        node1101 [fillcolor=yellow, group=1101];
-        node [fillcolor=green];
+        node1101 [fillcolor="/set16/4", group=1101];
+        node [fillcolor="/set16/3"];
         node1110 [group=1110]; node1111 [group=1111];
       }
-      node000 -> node0000 [headlabel="0", color=red, style=bold];
-      node000 -> node0001 [headlabel="1", color=red, style=bold];
-      node001 -> node0010 [headlabel="0", color=red, style=bold];
-      node001 -> node0011 [headlabel="1", color=red, style=bold];
-      node010 -> node0100 [headlabel="0", color=red, style=bold];
-      node010 -> node0101 [headlabel="1", color=red, style=bold];
-      node011 -> node0110 [headlabel="0", color=red, style=bold];
-      node011 -> node0111 [headlabel="1", color=red, style=bold];
-      node100 -> node1000 [headlabel="0", color=blue, style=bold];
-      node100 -> node1001 [headlabel="1", color=blue, style=bold];
-      node101 -> node1010 [headlabel="0", color=blue, style=bold];
-      node101 -> node1011 [headlabel="1", color=blue, style=bold];
+      node000 -> node0000 [headlabel="0", color="/set16/1", style=bold];
+      node000 -> node0001 [headlabel="1", color="/set16/1", style=bold];
+      node001 -> node0010 [headlabel="0", color="/set16/1", style=bold];
+      node001 -> node0011 [headlabel="1", color="/set16/1", style=bold];
+      node010 -> node0100 [headlabel="0", color="/set16/1", style=bold];
+      node010 -> node0101 [headlabel="1", color="/set16/1", style=bold];
+      node011 -> node0110 [headlabel="0", color="/set16/1", style=bold];
+      node011 -> node0111 [headlabel="1", color="/set16/1", style=bold];
+      node100 -> node1000 [headlabel="0", color="/set16/2", style=bold];
+      node100 -> node1001 [headlabel="1", color="/set16/2", style=bold];
+      node101 -> node1010 [headlabel="0", color="/set16/2", style=bold];
+      node101 -> node1011 [headlabel="1", color="/set16/2", style=bold];
       node110 -> node1100 [headlabel="0"];
       node110 -> node1101 [headlabel="1"];
-      node111 -> node1110 [headlabel="0", color=green, style=bold];
-      node111 -> node1111 [headlabel="1", color=green, style=bold];
+      node111 -> node1110 [headlabel="0", color="/set16/3", style=bold];
+      node111 -> node1111 [headlabel="1", color="/set16/3", style=bold];
 
-      node1101 [fillcolor=yellow, height=.2, style=filled];
-      node111  [fillcolor=green, height=.2, style=filled];
-      node10   [fillcolor=blue, height=.2, style=filled];
-      node0    [fillcolor=red, height=.2, style=filled];
+      node1101 [fillcolor="/set16/4", height=.2, style=filled];
+      node111  [fillcolor="/set16/3", height=.2, style=filled];
+      node10   [fillcolor="/set16/2", height=.2, style=filled];
+      node0    [fillcolor="/set16/1", height=.2, style=filled];
 
       subgraph broadcast1 {
         node [shape=box];
@@ -204,16 +204,16 @@ previous round.
         1001 [label=1001, group=1001];
         1101 [label=1101, group=1101];
         1111 [label=1111, group=1111];
-        edge [style=dotted];
+        edge [style=dotted, color=black];
         node0100 -> 0100;
         node1001 -> 1001;
         node1101 -> 1101;
         node1111 -> 1111;
-        edge [color=violet, dir=forward, splines=curved, style=solid];
-        node1100 -> 0100;
-        node1100 -> 1001;
-        node1100 -> 1101;
-        node1100 -> 1111;
+        edge [color="/set16/5", splines=curved, style=solid];
+        node1100 -> 0100 [dir=forward];
+        node1100 -> 1001 [dir=forward];
+        node1100 -> 1101 [dir=forward];
+        node1100 -> 1111 [dir=forward];
       }
 
       subgraph broadcast2 {
@@ -224,20 +224,20 @@ previous round.
         1000 [label=1000, group=1000];
         1010 [label=1010, group=1010];
         1110 [label=1110, group=1110];
-        edge [style=dotted];
+        edge [style=dotted, color=black];
         node0101 -> 0101;
         node0110 -> 0110;
         node0001 -> 0001;
         node1000 -> 1000;
         node1010 -> 1010;
         node1110 -> 1110;
-        edge [color=violet, dir=forward, splines=curved, style=solid];
-        0100 -> 0001;
-        0100 -> 0101;
-        0100 -> 0110;
-        1001 -> 1000;
-        1001 -> 1010;
-        1111 -> 1110;
+        edge [color="/set16/5", splines=curved, style=solid];
+        0100 -> 0001 [dir=forward];
+        0100 -> 0101 [dir=forward];
+        0100 -> 0110 [dir=forward];
+        1001 -> 1000 [dir=forward];
+        1001 -> 1010 [dir=forward];
+        1111 -> 1110 [dir=forward];
       }
     }
 
@@ -253,6 +253,91 @@ responsible for (contained in the message originally received). When
 forwarding the message, each node increases the height field in the
 message, in order to limit the responsibility of the receiving node,
 based on its distance from the sender.
+
+BROADCAST ALGORITHM 1 _Input: message text, height_
+
+    (0..height-1).each do |i|
+      if (buckets[i].size != 0) then
+        node = random node from buckets[i]
+        send(node, message, i)
+      end
+    end
+
+The algorithm above implements the broadcast. An initiator node sets the
+height to n − 1, the number of k-buckets, and the message text at will.
+Then starts sending the message to a randomly picked node from each
+k-bucket i. The buckets are sorted in a way that buckets[0] can contain
+maximum one node and is the closest possible from itself (their node IDs
+differs by only one least significant bit), that is k-bucket indexed
+with i contains nodes at a distance between 2i and 2i + 1. When sending
+a message to a node in the i-th bucket, the sender sets the height in
+the message to i, so to limit the broadcasting scope of the receiver.
+The height in this sense, represent the tree height-level already
+covered by other nodes.
+
+The problem with this algorithm is that some nodes are responsible of
+large subtrees. If one of these nodes fails to deliver the message, big
+subtrees wont receive it. Consider the first round of broadcasting, so
+messages are sent by the initiator to a node in each bucket. The node
+picked from the farthest bucket will be the only responsible of
+forwarding the message to other nodes in its subtree, which covers
+addressed at a distance between 2n − 1 and 2n, that is half the global
+tree. If that node fails to deliver the message (because of any of the
+possible failure types, i.e. crash, Byzantine), then, supposing a
+perfect binary tree, half of the nodes in the network wont receive the
+message.
+
+In (Zoltán Czirkos and Hosszú 2013) the _reliability_ of the
+broadcasting algorithm is defined as the ratio between nodes that
+receive the message and the total number of nodes in the network:
+$m = \frac{N_r}{N}$ where N is the total number of nodes and Nr is the
+number of nodes that receive the message. The authors set a
+probabilistic framework to evaluate the reliability starting from a
+measure of _successful delegate selection_, that is a message is
+successfully broadcasted in a subtree through the selection of a
+delegate like Algorithm 1. They define a delegate selection to be
+successful if the packet does not encounter any of three cases I) it is
+lost, II) the receiver is Byzantine or III) the entry in the routing
+table for the receiver is stale. The successful delegation probability
+is P = 1 − Ph where Ph denotes the probability of failure. The authors
+show that for a balanced tree of height b, the reliability of Algorithm
+1 is given by $m = \left( \frac{1 + P}{2} \right)^b$.
+
+To improve the reliability of the broadcasting algorithm, the authors of
+the same paper proposed an upgraded version of Algorithm 1 that uses
+_replication_. In Algorithm 2 the message is sent to more nodes in the
+same k-bucket, in this way there is not any more a single point of
+failure in a subtree, but the responsibility is replicated among a
+number kb of them. To maintain efficiency it is required that kb ≤ k in
+order to avoid sending find_node requests. Moreover because a node can
+now receive a message more than once, each message has to be tagged with
+a unique identifier.
+
+BROADCAST ALGORITHM 2 _Input: identifier, message text, height_
+
+    return if seen_messages.includes? identifier
+    seen_messages = seen_messages + [identifier]
+    (0..height-1).each do |i|
+      if buckets[i].size != 0 then
+        nodes = Kb random nodes from buckets[i]
+        nodes.each do |node|
+          send(node, identifier, message, i)
+        end
+      end
+    end
+
+By selecting more nodes from each k-bucket, the probability of failing
+to broadcast the message in a subtree will be Phkb where Ph is the
+probability of a single message getting lost and of the broadcast
+failing in the subtree the receiving node was responsible for. For
+example in a network with a fairly high amount of packets loss, lets say
+Ph = 10%, selecting a replication factor of kb = 2 will reduce the
+probability of losing a message to Ph² = 1%, thus the probability of
+successful delegation is increased from P = 90% to P = 99%. By
+substituting Phkb into Ph in the reliability's formula and solve for kb,
+we obtain an expression of the replication factor as a function of the
+reliability m, the tree height b and the probability of packet loss Ph:
+$$k_b = \left\lceil \frac{\ln (2 (1 - \sqrt[b]{m}))}{\ln P_h} \right\rceil$$
 
 
 Voting Protocol

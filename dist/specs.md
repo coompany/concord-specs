@@ -16,7 +16,7 @@ At the moment Concord implements only `ping` and `find_node` RPCs. This is becau
 
 Nodes are stored in a DHT. The local DHT is organized in *k-buckets*. For each bit in the `nodeId`, a node maintains a k-bucket, that is a FIFO list of nodes sorted with a last-seen policy (least recently seen node at the head). Let be *n* the number of bits in the `nodeId`. Each node maintains *n* k-buckets and each of them contains nodes at distance between 2<sup>*i*</sup> and 2<sup>*i* + 1</sup> ∀*i* ∈ {0, ..., *n* − 1}.
 
-<img src="graphviz-images/9cd4bbf1d4dd5d072de649081fb585394610eeb4.png" alt="" include="graphs/kademlia.dot" />
+<img src="graphviz-images/66849d954179b2c6724e48a48c3d5a3b662e1799.png" alt="" include="graphs/kademlia.dot" />
 
 In the above Figure, we show Kademlia's DHT for nodeId `1100` in a network where the ID space is in 4 bits. Each color corresponds to a different k-bucket's range. In each k-bucket node IDs can be present or not (in the Figure, all nodes are shown as present) and each node maintains locally a list of *k* nodes for each bucket. Note also that each k-bucket is responsible for progressively twice the number of node IDs when moving away from the local node's ID, that is *n*<sub>*i*</sub> = 2*n*<sub>*i* − 1</sub>∀*i* ∈ {1, ..., *n* − 1} and *n*<sub>0</sub> = 1 where *n*<sub>*i*</sub> is the number of possible node IDs in bucket *i*. By moving away from the current node ID, each k-bucket covers twice the number of node IDs.
 
@@ -24,9 +24,46 @@ In the above Figure, we show Kademlia's DHT for nodeId `1100` in a network where
 
 This term is used to mean a *one to all* communication originating at a single node. Broadcasting is for example used in BitTorrent to announce to other peers when a node starts downloading a file, in Concord it is used to announce a new poll. The problem of efficient broadcasting (that is, with a minimum number of messages) has been tackled in (El-Ansary et al. 2003). The paper focuses on Chord's DHT and overlay structure, but gives great hindsights on the subject. (Zoltdn Czirkos and Hosszu 2010) and (Zoltán Czirkos and Hosszú 2013) expand on the same idea, with a focus instead on Kademlia. The broadcasting algorithm exploits the network structure so to optimize the number of messages exchanged. The basic idea is an application of the divide-et-impera strategy: each node at each round is responsible for a smaller subtree than nodes at the previous round.
 
-<img src="graphviz-images/cc05bbe1f2acc09ae6181affe2eef5b331e97080.png" alt="" include="graphs/kademlia_broadcast.dot" />
+<img src="graphviz-images/e160fcb8a6452c33ef19d7a45a5997f6f1491615.png" alt="" include="graphs/kademlia_broadcast.dot" />
 
 The Figure above shows an example execution of the broadcast algorithm with node `1100` as the initiator. It starts the procedure by sending the message to a randomly selected node for each k-bucket. Each of the contacted node is then responsible for the subtree referenced by the k-bucket it belongs to. Each message contains also the height of the tree the receiving node is responsible for. Recursively then each of those nodes forwards the message to a randomly selected node in each of its k-buckets among those that reference nodes at the height it is responsible for (contained in the message originally received). When forwarding the message, each node increases the height field in the message, in order to limit the responsibility of the receiving node, based on its distance from the sender.
+
+**Broadcast Algorithm 1** <br /> *Input: message text, height*
+
+``` ruby
+(0..height-1).each do |i|
+  if (buckets[i].size != 0) then
+    node = random node from buckets[i]
+    send(node, message, i)
+  end
+end
+```
+
+The algorithm above implements the broadcast. An initiator node sets the height to *n* − 1, the number of k-buckets, and the message text at will. Then starts sending the message to a randomly picked node from each k-bucket *i*. The buckets are sorted in a way that `buckets[0]` can contain maximum one node and is the closest possible from itself (their node IDs differs by only one least significant bit), that is k-bucket indexed with *i* contains nodes at a distance between 2<sup>*i*</sup> and 2<sup>*i* + 1</sup>. When sending a message to a node in the *i*-th bucket, the sender sets the height in the message to *i*, so to limit the broadcasting scope of the receiver. The height in this sense, represent the tree height-level already covered by other nodes.
+
+The problem with this algorithm is that some nodes are responsible of large subtrees. If one of these nodes fails to deliver the message, big subtrees wont receive it. Consider the first round of broadcasting, so messages are sent by the initiator to a node in each bucket. The node picked from the farthest bucket will be the only responsible of forwarding the message to other nodes in its subtree, which covers addressed at a distance between 2<sup>*n* − 1</sup> and 2<sup>*n*</sup>, that is half the global tree. If that node fails to deliver the message (because of any of the possible failure types, i.e. crash, Byzantine), then, supposing a perfect binary tree, half of the nodes in the network wont receive the message.
+
+In (Zoltán Czirkos and Hosszú 2013) the *reliability* of the broadcasting algorithm is defined as the ratio between nodes that receive the message and the total number of nodes in the network: $m = \\frac{N\_r}{N}$ where *N* is the total number of nodes and *N*<sub>*r*</sub> is the number of nodes that receive the message. The authors set a probabilistic framework to evaluate the reliability starting from a measure of *successful delegate selection*, that is a message is successfully broadcasted in a subtree through the selection of a delegate like Algorithm 1. They define a delegate selection to be successful if the packet does not encounter any of three cases I) it is lost, II) the receiver is Byzantine or III) the entry in the routing table for the receiver is stale. The successful delegation probability is *P* = 1 − *P*<sub>*h*</sub> where *P*<sub>*h*</sub> denotes the probability of failure. The authors show that for a balanced tree of height *b*, the reliability of Algorithm 1 is given by $m = \\left( \\frac{1 + P}{2} \\right)^b$.
+
+To improve the reliability of the broadcasting algorithm, the authors of the same paper proposed an upgraded version of Algorithm 1 that uses *replication*. In Algorithm 2 the message is sent to more nodes in the same k-bucket, in this way there is not any more a single point of failure in a subtree, but the responsibility is replicated among a number *k*<sub>*b*</sub> of them. To maintain efficiency it is required that *k*<sub>*b*</sub> ≤ *k* in order to avoid sending `find_node` requests. Moreover because a node can now receive a message more than once, each message has to be tagged with a unique identifier.
+
+**Broadcast Algorithm 2** <br /> *Input: identifier, message text, height*
+
+``` ruby
+return if seen_messages.includes? identifier
+seen_messages = seen_messages + [identifier]
+(0..height-1).each do |i|
+  if buckets[i].size != 0 then
+    nodes = Kb random nodes from buckets[i]
+    nodes.each do |node|
+      send(node, identifier, message, i)
+    end
+  end
+end
+```
+
+By selecting more nodes from each k-bucket, the probability of failing to broadcast the message in a subtree will be *P*<sub>*h*</sub><sup>*k*<sub>*b*</sub></sup> where *P*<sub>*h*</sub> is the probability of a single message getting lost and of the broadcast failing in the subtree the receiving node was responsible for. For example in a network with a fairly high amount of packets loss, lets say *P*<sub>*h*</sub> = 10%, selecting a replication factor of *k*<sub>*b*</sub> = 2 will reduce the probability of losing a message to *P*<sub>*h*</sub><sup>2</sup> = 1%, thus the probability of successful delegation is increased from *P* = 90% to *P* = 99%. By substituting *P*<sub>*h*</sub><sup>*k*<sub>*b*</sub></sup> into *P*<sub>*h*</sub> in the reliability's formula and solve for *k*<sub>*b*</sub>, we obtain an expression of the replication factor as a function of the reliability *m*, the tree height *b* and the probability of packet loss *P*<sub>*h*</sub>:
+$$k\_b = \\left\\lceil \\frac{\\ln (2 (1 - \\sqrt\[b\]{m}))}{\\ln P\_h} \\right\\rceil$$
 
 Voting Protocol
 ---------------
